@@ -14,5 +14,9 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+app:
+  shortener:
+    domain: https://localhost:8081
+
 server:
   port: 8081

@@ -12,10 +12,9 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter @Setter
 public class ShortUrl {
 
     @Id
