@@ -1,9 +1,8 @@
 package com.jesga.url_shortener_service.controller;
 
-import com.jesga.url_shortener_service.ShortUrlService;
+import com.jesga.url_shortener_service.service.ShortUrlService;
 import com.jesga.url_shortener_service.entities.ShortUrl;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,9 +1,11 @@
-package com.jesga.url_shortener_service;
+package com.jesga.url_shortener_service.service;
 
 import com.jesga.url_shortener_service.entities.ShortUrl;
 import com.jesga.url_shortener_service.repository.ShortUrlRepository;
 import com.jesga.url_shortener_service.util.Base62Encoder;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -14,7 +16,8 @@ import java.util.Optional;
 public class ShortUrlService {
 
     private ShortUrlRepository shortUrlRepository;
-
+    
+    @CachePut(value = "SHORT_CACHE", key = "#result.shortCode()")
     public ShortUrl shorten(String originalUrl) {
 
         //TODO VALIDATE VALID URL
@@ -35,6 +38,7 @@ public class ShortUrlService {
 
     }
 
+    @Cacheable(value = "SHORT_CACHE", key = "shortCode                                   ")
     public ShortUrl getOriginalUrl(String shortCode) {
 
         //TODO VALIDATE EXPIRATION DATE
