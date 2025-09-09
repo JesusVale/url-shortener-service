@@ -1,7 +1,12 @@
 package com.jesga.url_shortener_service.controller;
 
+import com.jesga.url_shortener_service.dto.ShortenUrlRequest;
+import com.jesga.url_shortener_service.dto.analytics.ShortenUrlAnalytics;
 import com.jesga.url_shortener_service.service.ShortUrlService;
 import com.jesga.url_shortener_service.entities.ShortUrl;
+import com.jesga.url_shortener_service.service.UrlClicksService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +19,12 @@ import java.net.URI;
 public class ShortUrlController {
 
     private ShortUrlService service;
+    private UrlClicksService clicksLog;
 
     @PostMapping("/shorten")
-    public ResponseEntity<String> shortenUrl(@RequestBody String originalUrl) {
+    public ResponseEntity<String> shortenUrl(@Valid @RequestBody ShortenUrlRequest urlRequest) {
 
-        ShortUrl shortUrl = service.shorten(originalUrl);
+        ShortUrl shortUrl = service.shorten(urlRequest.originalUrl());
 
         String shortenUrl = "http://localhost:8081" + "/" + shortUrl.getShortCode();
 
@@ -27,13 +33,11 @@ public class ShortUrlController {
     }
 
     @GetMapping("/{shortCode}")
-    public ResponseEntity<Void> redirect(@PathVariable String shortCode) {
+    public ResponseEntity<Void> redirect(@PathVariable String shortCode, HttpServletRequest request) {
 
         ShortUrl shortUrlSaved = service.getOriginalUrl(shortCode);
 
-        if(shortUrlSaved == null) {
-            return ResponseEntity.status(HttpStatus.GONE).build();
-        }
+        clicksLog.logClick(shortCode, request.getRemoteAddr(), request.getHeader("User-Agent"));
 
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(shortUrlSaved.getOriginalUrl()))
@@ -41,4 +45,9 @@ public class ShortUrlController {
 
     }
 
+    @GetMapping("/stats/{shortCode}")
+    public ResponseEntity<ShortenUrlAnalytics> getStatsUrl(@PathVariable String shortCode) {
+        ShortenUrlAnalytics stats = clicksLog.getStats(shortCode);
+        return ResponseEntity.ok(stats);
+    }
 }
