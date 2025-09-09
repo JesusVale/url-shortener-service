@@ -1,26 +1,24 @@
 package com.jesga.url_shortener_service.service;
 
 import com.jesga.url_shortener_service.entities.ShortUrl;
+import com.jesga.url_shortener_service.exception.custom.ExpiredUrlException;
+import com.jesga.url_shortener_service.exception.custom.URLNotFoundException;
 import com.jesga.url_shortener_service.repository.ShortUrlRepository;
 import com.jesga.url_shortener_service.util.Base62Encoder;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @AllArgsConstructor
 @Service
 public class ShortUrlService {
 
     private ShortUrlRepository shortUrlRepository;
-    
-    @CachePut(value = "SHORT_CACHE", key = "#result.shortCode()")
-    public ShortUrl shorten(String originalUrl) {
 
-        //TODO VALIDATE VALID URL
+    @CachePut(value = "SHORT_CACHE", key = "#result.getShortCode()")
+    public ShortUrl shorten(String originalUrl) {
 
         ShortUrl shortUrl = new ShortUrl();
         shortUrl.setOriginalUrl(originalUrl);
@@ -38,19 +36,21 @@ public class ShortUrlService {
 
     }
 
-    @Cacheable(value = "SHORT_CACHE", key = "shortCode                                   ")
+    @Cacheable(value = "SHORT_CACHE", key = "#shortCode")
     public ShortUrl getOriginalUrl(String shortCode) {
 
-        //TODO VALIDATE EXPIRATION DATE
+        ShortUrl shortUrlFound = shortUrlRepository.findByShortCode(shortCode)
+                    .orElseThrow(() -> new URLNotFoundException(shortCode));
 
-        Optional<ShortUrl> shortUrlFound = shortUrlRepository.findByShortCode(shortCode);
+        if(shortUrlFound.getExpiresAt() != null && shortUrlFound.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new ExpiredUrlException(shortCode);
+        }
 
-        shortUrlFound.ifPresent(shortUrl -> {
-            shortUrl.setClickCount(shortUrl.getClickCount() + 1);
-            shortUrlRepository.save(shortUrl);
-        });
+        shortUrlFound.setClickCount(shortUrlFound.getClickCount() + 1);
+        shortUrlRepository.save(shortUrlFound);
 
-        return shortUrlFound.orElse(null);
+
+        return shortUrlFound;
 
     }
 
