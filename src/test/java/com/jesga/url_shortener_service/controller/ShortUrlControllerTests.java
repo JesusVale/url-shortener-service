@@ -1,7 +1,5 @@
 package com.jesga.url_shortener_service.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jesga.url_shortener_service.dto.analytics.DailyClick;
 import com.jesga.url_shortener_service.dto.analytics.ShortenUrlAnalytics;
 import com.jesga.url_shortener_service.dto.analytics.TopUserAgent;
 import com.jesga.url_shortener_service.entities.ShortUrl;
@@ -14,11 +12,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.LocalDateTime;
 import java.util.List;
