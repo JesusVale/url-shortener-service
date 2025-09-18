@@ -6,7 +6,6 @@ import com.jesga.url_shortener_service.service.ShortUrlService;
 import com.jesga.url_shortener_service.entities.ShortUrl;
 import com.jesga.url_shortener_service.service.UrlClicksService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +15,13 @@ import java.net.URI;
 
 @AllArgsConstructor
 @RestController
-public class ShortUrlController {
+public class ShortUrlController implements IShortUrlController {
 
     private ShortUrlService service;
     private UrlClicksService clicksLog;
 
-    @PostMapping("/shorten")
-    public ResponseEntity<String> shortenUrl(@Valid @RequestBody ShortenUrlRequest urlRequest) {
+    @Override
+    public ResponseEntity<String> shortenUrl(ShortenUrlRequest urlRequest) {
 
         ShortUrl shortUrl = service.shorten(urlRequest.originalUrl());
 
@@ -32,8 +31,8 @@ public class ShortUrlController {
 
     }
 
-    @GetMapping("/{shortCode}")
-    public ResponseEntity<Void> redirect(@PathVariable String shortCode, HttpServletRequest request) {
+    @Override
+    public ResponseEntity<Void> redirect(String shortCode, HttpServletRequest request) {
 
         ShortUrl shortUrlSaved = service.getOriginalUrl(shortCode);
 
@@ -45,7 +44,7 @@ public class ShortUrlController {
 
     }
 
-    @GetMapping("/stats/{shortCode}")
+    @Override
     public ResponseEntity<ShortenUrlAnalytics> getStatsUrl(@PathVariable String shortCode) {
         ShortenUrlAnalytics stats = clicksLog.getStats(shortCode);
         return ResponseEntity.ok(stats);
