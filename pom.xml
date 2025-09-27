@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.jesga</groupId>
 	<artifactId>url-shortener-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>url-shortener-service</name>
 	<description>Url Shortener Service</description>
 	<url/>
@@ -88,7 +88,12 @@
             <version>2.8.13</version>
         </dependency>
 
-		<dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
@@ -126,6 +131,16 @@
 					</excludes>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.4.6</version>
+                <configuration>
+                    <to>
+                        <image>jesusvale/${project.artifactId}:${project.version}</image>
+                    </to>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 
